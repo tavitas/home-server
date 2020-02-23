@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  portainer:
+    env_file: 
+      - .env
+    image: portainer/portainer
+    container_name: portainer
+    restart: always
+    ports:
+      - "9010:9000"
+    volumes:
+      - ./data:/data
+      - ./shared:/shared
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TZ=TZ
+  
+  organizr:
+    env_file: 
+      - .env
+    container_name: organizr
+    restart: always
+    image: lsiocommunity/organizr
+    volumes:
+      - ./organizr:/config
+      - ./shared:/shared
+    ports:
+      - "9020:80"
+    environment:
+      - PUID=PUID
+      - PGID=PGID
+      - TZ=TZ
+
+  watchtower:
+    container_name: watchtower
+    restart: always
+    image: v2tec/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --schedule "0 0 4 * * *" --cleanup
